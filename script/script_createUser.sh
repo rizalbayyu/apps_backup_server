@@ -7,6 +7,9 @@ if [ $EUID -ne 0 ]; then
     echo "This script must be run as root. Please Login as root"
     exit 1
 else
+    mysql -e "SET GLOBAL validate_password.length = 6;"
+    mysql -e "SET GLOBAL validate_password.number_count = 0;"
+    mysql -e "SET GLOBAL validate_password.policy = 0;"
     echo "Start create user"
     mysql -e "CREATE USER '${USER}'@'localhost' IDENTIFIED BY '${PASSWORD}';"
     sleep 3s
