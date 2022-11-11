@@ -96,20 +96,6 @@ $(document).ready(function(){
         }
     });
  });
-
- $(document).on("click", ".backup", function(){
-    var action = "database";
-    var folder_name = $(this).data("name");
-    $.ajax({
-        url:"db.php",
-        method:"POST",
-        data:{action:action, folder_name:folder_name},
-        success:function(data)
-        {
-            alert(data);
-        }
-    });
- });
  
  $(document).on("click", ".delete", function(){
   var folder_name = $(this).data("name");

@@ -105,10 +105,58 @@ if(isset($_POST["action"]))
     $repo_name = $_POST["folder_name"];
     $oldPath = getcwd();
     chdir('script/');
-    exec("./script_backup_repo.sh $repo_name");
+    exec("sudo scp -r $repo_name devops@192.168.18.10:/home/devops/repo_backup", $output, $return);
     chdir($oldPath);
-    echo "Repo pada direktori ", $repo_name, " berhasil di backup";
 
+    if (!$return) {
+      $string = $_POST["folder_name"];
+      $prefix = '/home/';
+      $index = strpos($string, $prefix) + strlen($prefix);
+      $fixWord = substr($string, $index);
+  
+      $servername = "localhost";
+      $username = "devops";
+      $password = "devops!@#";
+      $dbname = "repo";
+     
+  // Create connection
+      $conn = mysqli_connect($servername, $username, $password, $dbname);
+  
+  // Check connection
+      if ($conn->connect_error) {
+  
+          die("Connection failed: " . $conn->connect_error);
+  
+      } else {
+  
+  
+          $date = date("Y-m-d");
+          $timestamp = date("H:i:s");
+  
+          // $result = mysqli_query($conn, "SELECT repo_id FROM nama_repo WHERE repo_id = '$fixWord'");
+  
+          // $num_rows = mysql_num_rows($result);
+      
+          if (mysqli_query($conn, "INSERT INTO nama_repo VALUE ('$fixWord', '$date', '$timestamp', ' ')") === true ) {
+  
+              echo "Repo_id ", $fixWord ," sudah disimpan pada database <br>";
+          
+          } elseif (mysqli_query($conn, "SELECT repo_id FROM nama_repo WHERE repo_id='$fixWord'")) {
+              mysqli_query($conn, "UPDATE nama_repo SET `date`='$date' WHERE repo_id='$fixWord'");
+              mysqli_query($conn, "UPDATE nama_repo SET `time`='$timestamp' WHERE repo_id='$fixWord'");
+              echo "Update backup berhasil";
+  
+          } else {
+  
+              echo "Error: ", mysqli_query($conn, "INSERT INTO nama_repo VALUE ('$fixWord')"), " itu errornya";
+  
+          }
+  
+      }
+      echo "Backup data from $repo_name is Success";
+    } else {
+      echo "Something went wrong with scp command. Maybe because there was an error for privellege or the server is not accessible";
+    }
  }
  
  if($_POST["action"] == "fetch_files")
@@ -202,25 +250,29 @@ if(isset($_POST["action"]))
     $repo_name = $_POST["repo_name"];
     $oldPath = getcwd();
     chdir('script/');
-    exec("./script_restore_repo.sh $repo_name");
+    exec("sudo scp -r devops@192.168.18.10:/home/devops/repo_backup/$repo_name /home/rizal/repo/", $output, $return);
     chdir($oldPath);
 
-    $servername = "localhost";
-    $username = "devops";
-    $password = "devops!@#";
-    $dbname = "repo";
-
-    $conn = mysqli_connect($servername, $username, $password, $dbname);
-
-    // Check connection
-    if ($conn->connect_error) {
-
-      die("Connection failed: " . $conn->connect_error);
-
+    if (!$return) {
+      $servername = "localhost";
+      $username = "devops";
+      $password = "devops!@#";
+      $dbname = "repo";
+  
+      $conn = mysqli_connect($servername, $username, $password, $dbname);
+  
+      // Check connection
+      if ($conn->connect_error) {
+  
+        die("Connection failed: " . $conn->connect_error);
+  
+      } else {
+        $date = date("Y-m-d H:i:s");
+        mysqli_query($conn, "UPDATE nama_repo SET `last`='$date' WHERE repo_id='$repo_name'");
+        echo "Restore is successful";
+      }
     } else {
-      $date = date("Y-m-d H:i:s");
-      mysqli_query($conn, "UPDATE nama_repo SET `last`='$date' WHERE repo_id='$repo_name'");
-      echo "Repo berhasil di restore";
+      echo "Something went wrong with scp command. Maybe because there was an error for privellege or the server is not accessible";
     }
 
  }
