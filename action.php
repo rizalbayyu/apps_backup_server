@@ -52,7 +52,7 @@ if(isset($_POST["action"]))
 {
  if($_POST["action"] == "fetch")
  {
-  $folder = array_filter(glob('/home/*'), 'is_dir');
+  $folder = array_filter(glob('/home/repo/*'), 'is_dir');
   
   $output = '
   <table class="table table-bordered table-striped">
@@ -103,62 +103,59 @@ if(isset($_POST["action"]))
  if($_POST["action"] == "backup")
  {
     $repo_name = $_POST["folder_name"];
-    $oldPath = getcwd();
-    chdir('script/');
-    exec("sudo scp -r $repo_name devops@192.168.18.10:/home/devops/repo_backup", $output, $return);
-    chdir($oldPath);
+    exec("sudo scp -r $repo_name root@101.50.0.67:/home/backup", $output, $return);
+    //print_r($output);
+    //echo "<br/>";
+    //print_r($return);
+    //exit();
 
     if (!$return) {
       $string = $_POST["folder_name"];
-      $prefix = '/home/';
+      $prefix = '/home/repo/';
       $index = strpos($string, $prefix) + strlen($prefix);
       $fixWord = substr($string, $index);
-  
+
       $servername = "localhost";
-      $username = "devops";
-      $password = "devops!@#";
-      $dbname = "repo";
-     
+      $username = "us3r";
+      $password = "#Sismik123";
+      $dbname = "auto_backup";
+
   // Create connection
       $conn = mysqli_connect($servername, $username, $password, $dbname);
-  
+
   // Check connection
       if ($conn->connect_error) {
-  
+
           die("Connection failed: " . $conn->connect_error);
   
       } else {
-  
-  
+
           $date = date("Y-m-d");
           $timestamp = date("H:i:s");
-  
-          // $result = mysqli_query($conn, "SELECT repo_id FROM nama_repo WHERE repo_id = '$fixWord'");
-  
-          // $num_rows = mysql_num_rows($result);
-      
+
           if (mysqli_query($conn, "INSERT INTO nama_repo VALUE ('$fixWord', '$date', '$timestamp', ' ')") === true ) {
-  
-              echo "Repo_id ", $fixWord ," sudah disimpan pada database <br>";
-          
+
+              echo "Repo_id ". $fixWord ." sudah disimpan pada database, ";
+
           } elseif (mysqli_query($conn, "SELECT repo_id FROM nama_repo WHERE repo_id='$fixWord'")) {
               mysqli_query($conn, "UPDATE nama_repo SET `date`='$date' WHERE repo_id='$fixWord'");
               mysqli_query($conn, "UPDATE nama_repo SET `time`='$timestamp' WHERE repo_id='$fixWord'");
-              echo "Update backup berhasil";
-  
+              echo "Update backup berhasil, ";
+
           } else {
-  
+
               echo "Error: ", mysqli_query($conn, "INSERT INTO nama_repo VALUE ('$fixWord')"), " itu errornya";
-  
+
           }
-  
+
       }
       echo "Backup data from $repo_name is Success";
     } else {
       echo "Something went wrong with scp command. Maybe because there was an error for privellege or the server is not accessible";
     }
+
  }
- 
+
  if($_POST["action"] == "fetch_files")
  {
   $file_data = scandir($_POST["folder_name"]);
@@ -166,9 +163,8 @@ if(isset($_POST["action"]))
   <table class="table table-bordered table-striped">
    <tr>
     <th>File Name</th>
-   </tr>
-  ';
-  
+   </tr>';
+
   foreach($file_data as $file)
   {
    if($file === '.' or $file === '..')
@@ -202,10 +198,10 @@ if(isset($_POST["action"]))
    </tr>
   ';
   $servername = "localhost";
-  $username = "devops";
-  $password = "devops!@#";
-  $dbname = "repo";
- 
+  $username = "us3r";
+  $password = "#Sismik123";
+  $dbname = "auto_backup";
+
 // Create connection
   $conn = mysqli_connect($servername, $username, $password, $dbname);
 
@@ -220,7 +216,7 @@ if(isset($_POST["action"]))
     $sql = "SELECT * FROM nama_repo";
 
     $result = mysqli_query($conn, $sql);
-    
+
     if (mysqli_num_rows($result) > 0) {
   // output data of each row
         while($row = mysqli_fetch_assoc($result)) {
@@ -244,28 +240,27 @@ if(isset($_POST["action"]))
       $output .='</table>';
       echo $output;
     }
- 
+
  if($_POST["action"] == "restore")
  {
     $repo_name = $_POST["repo_name"];
-    $oldPath = getcwd();
-    chdir('script/');
-    exec("sudo scp -r devops@192.168.18.10:/home/devops/repo_backup/$repo_name /home/rizal/repo/", $output, $return);
-    chdir($oldPath);
+
+    exec("sudo scp -r root@101.50.0.67:/home/backup/$repo_name /home/backup-test", $output, $return);
 
     if (!$return) {
+
       $servername = "localhost";
-      $username = "devops";
-      $password = "devops!@#";
-      $dbname = "repo";
-  
+      $username = "us3r";
+      $password = "#Sismik123";
+      $dbname = "auto_backup";
+
       $conn = mysqli_connect($servername, $username, $password, $dbname);
-  
+
       // Check connection
       if ($conn->connect_error) {
-  
+
         die("Connection failed: " . $conn->connect_error);
-  
+
       } else {
         $date = date("Y-m-d H:i:s");
         mysqli_query($conn, "UPDATE nama_repo SET `last`='$date' WHERE repo_id='$repo_name'");
@@ -274,12 +269,11 @@ if(isset($_POST["action"]))
     } else {
       echo "Something went wrong with scp command. Maybe because there was an error for privellege or the server is not accessible";
     }
-
  }
   if($_POST["action"] == "delete_repo")
   {
-    $folder = array_filter(glob('/home/*'), 'is_dir');
-    
+    $folder = array_filter(glob('/home/repo/*'), 'is_dir');
+
     $output = '
     <table class="table table-bordered table-striped">
     <tr>

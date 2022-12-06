@@ -1,5 +1,5 @@
-1 0 * * * /root/scriptForBackupRepoEveryDay.sh //main di server backup
-5 0 * * * /root/scriptForClearBackup3DaysAgo.sh //main di server backup
+1 0 * * * /root/scriptDailyBackup.sh //main di server backup
+5 0 * * * /root/scriptClearOldBackup.sh //main di server backup
 
 1 0 * * * /root/scriptForBackupRepoDBEveryDay.sh //main di server utama
 5 0 * * * /root/scriptForClearDatabase.sh //main di server utama
